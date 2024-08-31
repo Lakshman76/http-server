@@ -31,11 +31,10 @@ const server = net.createServer((socket) => {
       if (!fs.existsSync(filePath)) {
         socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
       } else {
-        const fileContent = fs.readFileSync(filePath);
+        const fileContent = fs.readFileSync(filePath).toString();
         socket.write(
-          `HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${fileContent.length}\r\n\r\n`
+          `HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${fileContent.length}\r\n\r\n${fileContent}`
         );
-        socket.write(fileContent);
       }
     } else {
       socket.write("HTTP/1.1 404 Not Found\r\n\r\n");

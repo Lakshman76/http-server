@@ -25,15 +25,15 @@ const server = net.createServer((socket) => {
         `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgentValue.length}\r\n\r\n${userAgentValue}`
       );
     } else if (urlPath.startsWith("/files/")) {
-      const filename = urlPath.split("/")[2]; // --> /files/filename
-      const fileurlPath = path.join(process.cwd(), "files", filename);
+      const filename = urlPath.split("/").slice(2).join("/"); // --> /files/filename
+      const filePath = path.join(process.cwd(), "files", filename);
 
-      if (!fs.existsSync(fileurlPath)) {
+      if (!fs.existsSync(filePath)) {
         socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
         socket.end();
         return;
       }
-      const fileContent = fs.readFileSync(fileurlPath);
+      const fileContent = fs.readFileSync(filePath);
       socket.write(
         `HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${fileContent.length}\r\n\r\n`
       );

@@ -2,6 +2,8 @@ const net = require("net");
 const path = require("path");
 const fs = require("fs");
 
+const directory = process.argv[2] || path.join(process.cwd(), "files");
+
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
     const request = data.toString();
@@ -26,16 +28,16 @@ const server = net.createServer((socket) => {
       );
     } else if (urlPath.startsWith("/files/")) {
       const filename = urlPath.split("/")[2]; // --> /files/filename
-      const filePath = path.join(process.cwd(), "files", filename);
+      const filePath = path.join(directory, filename);
 
       if (!fs.existsSync(filePath)) {
         socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
       } else {
-        const fileContent = fs.readFileSync(filePath).toString(); // convert buffer to string
+        const fileContent = fs.readFileSync(filePath);
         socket.write(
           `HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${fileContent.length}\r\n\r\n`
         );
-        socket.write(fileContent);
+        socket.write(fileContent.toString());
       }
     } else {
       socket.write("HTTP/1.1 404 Not Found\r\n\r\n");

@@ -28,7 +28,7 @@ const server = net.createServer((socket) => {
           `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: ${acceptEncodingValue}\r\n\r\n`
         );
       } else if (acceptEncodingValue === "invalid-encoding") {
-        socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain`);
+        socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n`);
       } else {
         const message = urlPath.split("/")[2]; // --> /echo/abc
         socket.write(

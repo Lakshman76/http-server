@@ -1,6 +1,7 @@
 const net = require("net");
 const path = require("path");
 const fs = require("fs");
+const zlib = require("zlib");
 
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
@@ -24,12 +25,16 @@ const server = net.createServer((socket) => {
     if (urlPath === "/") {
       socket.write("HTTP/1.1 200 OK\r\n\r\n");
     } else if (urlPath.startsWith("/echo/")) {
+      const message = urlPath.split("/")[2]; // --> /echo/abc = abc
       let response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n`;
+
       if (!acceptEncodingHeader) {
-        const message = urlPath.split("/")[2]; // --> /echo/abc
         response += `Content-Length: ${message.length}\r\n\r\n${message}`;
       } else if (multipleEncodingValue.includes("gzip")) {
-        response += `Content-Encoding: gzip\r\n\r\n`;
+        response += `Content-Encoding: gzip\r\n`;
+        const msgEncoded = zlib.gzipSync(message);
+        const msgEncodedLength = msgEncoded.length;
+        response += `Content-Length: ${msgEncodedLength}\r\n\r\n${msgEncoded}`
       } else {
         response += `\r\n`;
       }

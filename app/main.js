@@ -21,7 +21,7 @@ const server = net.createServer((socket) => {
         `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${message.length}\r\n\r\n${message}`
       );
     } else if (urlPath === "/user-agent") {
-      const agentHeader = request.split("\r\n")[2];
+      const agentHeader = request[2];
       const userAgentValue = agentHeader.split(" ")[1];
 
       socket.write(

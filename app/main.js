@@ -23,11 +23,11 @@ const server = net.createServer((socket) => {
     if (urlPath === "/") {
       socket.write("HTTP/1.1 200 OK\r\n\r\n");
     } else if (urlPath.startsWith("/echo/")) {
-      if (acceptEncodingValue === "gzip") {
+      if (acceptEncodingValue.includes("gzip")) {
         socket.write(
           `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: ${acceptEncodingValue}\r\n\r\n`
         );
-      } else if (acceptEncodingValue === "invalid-encoding") {
+      } else if (!acceptEncodingValue.includes("gzip")) {
         socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n`);
       } else {
         const message = urlPath.split("/")[2]; // --> /echo/abc

@@ -18,23 +18,21 @@ const server = net.createServer((socket) => {
     );
     const acceptEncodingValue = acceptEncodingHeader
       ? acceptEncodingHeader.split(": ")[1]
-      : null;
+      : "";
 
     if (urlPath === "/") {
       socket.write("HTTP/1.1 200 OK\r\n\r\n");
     } else if (urlPath.startsWith("/echo/")) {
+      let response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n";
       if (acceptEncodingValue.includes("gzip")) {
-        socket.write(
-          `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: ${acceptEncodingValue}\r\n\r\n`
-        );
+        response += "Content-Encoding: ${acceptEncodingValue}\r\n\r\n";
       } else if (!acceptEncodingValue.includes("gzip")) {
-        socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n`);
+        response += "\r\n";
       } else {
         const message = urlPath.split("/")[2]; // --> /echo/abc
-        socket.write(
-          `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${message.length}\r\n\r\n${message}`
-        );
+        response += `Content-Length: ${message.length}\r\n\r\n${message}`;
       }
+      socket.write(response);
     } else if (urlPath === "/user-agent") {
       const agentHeader = request[2];
       const userAgentValue = agentHeader.split(" ")[1];

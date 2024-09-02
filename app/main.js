@@ -30,15 +30,19 @@ const server = net.createServer((socket) => {
 
       if (!acceptEncodingHeader) {
         response += `Content-Type: text/plain\r\nContent-Length: ${message.length}\r\n\r\n${message}`;
+        socket.write(response);
       } else if (multipleEncodingValue.includes("gzip")) {
         response += `Content-Encoding: gzip\r\nContent-Type: text/plain\r\n`;
-        const msgEncoded = zlib.inflateSync(message);
+        const msgEncoded = zlib.gzipSync(message);
         const msgEncodedLength = msgEncoded.length;
-        response += `Content-Length: ${msgEncodedLength}\r\n\r\n${msgEncoded}`
+        response += `Content-Length: ${msgEncodedLength}\r\n\r\n`
+        socket.write(response);
+        socket.write(msgEncoded);
       } else {
         response += `Content-Type: text/plain\r\n\r\n`;
+        socket.write(response);
       }
-      socket.write(response);
+      
     } else if (urlPath === "/user-agent") {
       const agentHeader = request[2];
       const userAgentValue = agentHeader.split(" ")[1];

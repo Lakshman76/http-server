@@ -26,17 +26,17 @@ const server = net.createServer((socket) => {
       socket.write("HTTP/1.1 200 OK\r\n\r\n");
     } else if (urlPath.startsWith("/echo/")) {
       const message = urlPath.split("/")[2]; // --> /echo/abc = abc
-      let response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n`;
+      let response = `HTTP/1.1 200 OK\r\n`;
 
       if (!acceptEncodingHeader) {
-        response += `Content-Length: ${message.length}\r\n\r\n${message}`;
+        response += `Content-Type: text/plain\r\nContent-Length: ${message.length}\r\n\r\n${message}`;
       } else if (multipleEncodingValue.includes("gzip")) {
-        response += `Content-Encoding: gzip\r\n`;
+        response += `Content-Encoding: gzip\r\nContent-Type: text/plain\r\n`;
         const msgEncoded = zlib.gzipSync(message);
         const msgEncodedLength = msgEncoded.length;
         response += `Content-Length: ${msgEncodedLength}\r\n\r\n${msgEncoded}`
       } else {
-        response += `\r\n`;
+        response += `Content-Type: text/plain\r\n\r\n`;
       }
       socket.write(response);
     } else if (urlPath === "/user-agent") {

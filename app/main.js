@@ -32,7 +32,7 @@ const server = net.createServer((socket) => {
         response += `Content-Type: text/plain\r\nContent-Length: ${message.length}\r\n\r\n${message}`;
       } else if (multipleEncodingValue.includes("gzip")) {
         response += `Content-Encoding: gzip\r\nContent-Type: text/plain\r\n`;
-        const msgEncoded = zlib.gzipSync(message);
+        const msgEncoded = zlib.inflateSync(message);
         const msgEncodedLength = msgEncoded.length;
         response += `Content-Length: ${msgEncodedLength}\r\n\r\n${msgEncoded}`
       } else {

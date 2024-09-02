@@ -18,7 +18,7 @@ const server = net.createServer((socket) => {
     );
     const acceptEncodingValue = acceptEncodingHeader
       ? acceptEncodingHeader.split(": ")[1]
-      : null;
+      : "";
     const multipleEncodingValue = acceptEncodingValue.split(", ");
 
     if (urlPath === "/") {

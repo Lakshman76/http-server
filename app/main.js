@@ -18,20 +18,20 @@ const server = net.createServer((socket) => {
     );
     const acceptEncodingValue = acceptEncodingHeader
       ? acceptEncodingHeader.split(": ")[1]
-      : "";
-      const multipleEncodingValue = acceptEncodingValue.split(", ");
+      : null;
+    const multipleEncodingValue = acceptEncodingValue.split(", ");
 
     if (urlPath === "/") {
       socket.write("HTTP/1.1 200 OK\r\n\r\n");
     } else if (urlPath.startsWith("/echo/")) {
       let response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n`;
-      if (multipleEncodingValue.includes("gzip")) {
-        response += `Content-Encoding: gzip\r\n\r\n`;
-      } else if (!multipleEncodingValue.includes("gzip")) {
-        response += `\r\n`;
-      } else {
+      if (!acceptEncodingHeader) {
         const message = urlPath.split("/")[2]; // --> /echo/abc
         response += `Content-Length: ${message.length}\r\n\r\n${message}`;
+      } else if (multipleEncodingValue.includes("gzip")) {
+        response += `Content-Encoding: gzip\r\n\r\n`;
+      } else {
+        response += `\r\n`;
       }
       socket.write(response);
     } else if (urlPath === "/user-agent") {

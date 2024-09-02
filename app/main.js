@@ -19,14 +19,15 @@ const server = net.createServer((socket) => {
     const acceptEncodingValue = acceptEncodingHeader
       ? acceptEncodingHeader.split(": ")[1]
       : "";
+      const multipleEncodingValue = acceptEncodingValue.split(", ");
 
     if (urlPath === "/") {
       socket.write("HTTP/1.1 200 OK\r\n\r\n");
     } else if (urlPath.startsWith("/echo/")) {
       let response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n`;
-      if (acceptEncodingValue.includes("gzip")) {
+      if (multipleEncodingValue.includes("gzip")) {
         response += `Content-Encoding: ${acceptEncodingValue}\r\n\r\n`;
-      } else if (!acceptEncodingValue.includes("gzip")) {
+      } else if (!multipleEncodingValue.includes("gzip")) {
         response += `\r\n`;
       } else {
         const message = urlPath.split("/")[2]; // --> /echo/abc

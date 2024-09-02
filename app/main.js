@@ -12,14 +12,29 @@ const server = net.createServer((socket) => {
     const httpMethod = requestLine.split(" ")[0];
     const urlPath = requestLine.split(" ")[1];
 
+    // Find the Accept-Encoding header
+    const acceptEncodingHeader = request.find((line) =>
+      line.startsWith("Accept-Encoding:")
+    );
+    const acceptEncodingValue = acceptEncodingHeader
+      ? acceptEncodingHeader.split(": ")[1]
+      : null;
+
     if (urlPath === "/") {
       socket.write("HTTP/1.1 200 OK\r\n\r\n");
     } else if (urlPath.startsWith("/echo/")) {
-      const message = urlPath.split("/")[2]; // --> /echo/abc
-
-      socket.write(
-        `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${message.length}\r\n\r\n${message}`
-      );
+      if (acceptEncodingValue === "gzip") {
+        socket.write(
+          `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: ${acceptEncodingValue}`
+        );
+      } else if (acceptEncodingValue === "invalid-encoding") {
+        socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain`);
+      } else {
+        const message = urlPath.split("/")[2]; // --> /echo/abc
+        socket.write(
+          `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${message.length}\r\n\r\n${message}`
+        );
+      }
     } else if (urlPath === "/user-agent") {
       const agentHeader = request[2];
       const userAgentValue = agentHeader.split(" ")[1];

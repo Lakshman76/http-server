@@ -4,10 +4,10 @@ const fs = require("fs");
 
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
-    const request = data.toString();
+    const request = data.toString().split("\r\n");
 
-    const requestLine = request.split("\r\n")[0];
-    const requestBody = request.split("\r\n")[7]; // data
+    const requestLine = request[0];
+    const requestBody = request[request.length - 1]; // data
 
     const httpMethod = requestLine.split(" ")[0];
     const urlPath = requestLine.split(" ")[1];
